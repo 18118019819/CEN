@@ -264,6 +264,7 @@ def load_all_answers(total_data, num_rel):
 def load_all_answers_for_filter(total_data, num_rel, rel_p=False):
     # store subjects for all (rel, object) queries and
     # objects for all (subject, rel) queries
+    # 每个array都进行 s:{r:{o1,o2...}}   或者 o:{r:{s1,s2...}}
     def add_relation(e1, e2, r, d):
         if not e1 in d:
             d[e1] = {}
@@ -284,6 +285,7 @@ def load_all_answers_for_filter(total_data, num_rel, rel_p=False):
 
 
 def load_all_answers_for_time_filter(total_data, num_rels, num_nodes, rel_p=False):
+    # 将所有array的 s:{r:{o1,o2...}}   或者 o:{r:{s1,s2...}}放一块
     all_ans_list = []
     all_snap = split_by_time(total_data)
     for snap in all_snap:
@@ -335,9 +337,11 @@ def split_by_time(data):
     nodes = []
     rels = []
 
-    print("==============================")
+        # 这段代码没有看懂
     for snapshot in snapshot_list:
         # print(f"snapshot[:,0]:{snapshot[:, 0]}")
+        # np.unique--->删除重复元素，按照从大到小组成一个新元组或者列表，
+        # return_inverse：返回新的排序的每个数在旧列表的下表位置（列表形式）
         uniq_v, edges = np.unique((snapshot[:,0], snapshot[:,2]), return_inverse=True)  # relabel
         uniq_r = np.unique(snapshot[:,1])
         edges = np.reshape(edges, (2, -1))

@@ -17,7 +17,7 @@ import time
 import pickle
 import copy
 
-import dgl
+# import dgl
 import numpy as np
 import torch
 # from tqdm import tqdm
@@ -326,7 +326,9 @@ def add_inverse(snap_list, num_rel):
     # add inverse triples to train_list
     all_list = []
     for triples in snap_list:
+        # 将数组得列前后倒换
         inverse_triples = triples[:, [2, 1, 0]]
+        # 将中间一列r+num_rel
         inverse_triples[:, 1] = inverse_triples[:, 1] + num_rel
         all_triples = np.concatenate((triples, inverse_triples))
         all_list.append(all_triples)
@@ -353,9 +355,12 @@ def run_experiment(args, n_hidden=None, n_layers=None, dropout=None, n_bases=Non
     print("total data length ", len(total_data))
     num_nodes = data.num_nodes
     num_rels = data.num_rels
+    # 获得s:{r:{o1,o2...}}  和 o:{r+num_rels:{s1,s2...}}
     all_ans_list = utils.load_all_answers_for_time_filter(total_data, num_rels, num_nodes, False)
+    # 获得s:{o:{r1,r2...}}  和  s:{o:{r1+num_rels,r2+num_rels...}}
     all_ans_list_r = utils.load_all_answers_for_time_filter(total_data, num_rels, num_nodes, True)
 
+    # train_list反转后，r+num_rels，再和本来的train_list拼接在一块
     train_list = add_inverse(train_list, num_rels)
     valid_list = add_inverse(valid_list, num_rels)
     test_list = add_inverse(test_list, num_rels)
@@ -394,7 +399,6 @@ def run_experiment(args, n_hidden=None, n_layers=None, dropout=None, n_bases=Non
                         gpu = args.gpu)
 
     if use_cuda:
-        # line 395,396后期加入,并隐藏397
         print(args.gpu)
         # torch.cuda.set_device('cuda:1')  # torch.device('cuda:0')
         torch.cuda.set_device(args.gpu)
